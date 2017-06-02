@@ -44,12 +44,15 @@ The features were then stacked together and had a scaler applied to them. They w
 
 ## Window Splitting, HOG Subsampling and Heatmaps.
 
-I initially broke the image into 3 different size window sets (see cell 7 of the notebook) for the close, medium distance, and distant vehicles. The window sizes were 64px, 96px and 128px. These sets of windows, allocated using the 'sliding windows' function are then added together. 
+I initially broke the image into 3 different size window sets (see cell 7 of the notebook) for the close, medium distance, and distant vehicles. The window sizes were 64px, 96px and 128px. These sets of windows, allocated using the 'sliding windows' function are then added together. I also experimented with various levels of overlap. 75% seemed the best, but increased the 
+number of windows to analyse by too much, and so I settled on an overlap of 50% which still achieved a level of redundancy, but at a lower cost. 
 
 This method was too slow for the end process of running this pipeline on a video stream, and so a single function was later used that took the HOG features of the entire window, and then sub-sampled. I experimented with various scales from the original image size of 64 px and evenually settled on a scale of 1.3 - see code cell 8 of the notebook. 
 
 At this point, the heatmap method was implemented as well, to show the number and location of the detections. 
-Following this, the 'label' function, from the scipy.ndimage library was used for getting a single block around each car (but it didnt work when the view of 2 cars overlapped). 
+Following this, the 'label' function, from the scipy.ndimage library was used for getting a single block around each car (but it didnt work when the view of 2 cars overlapped). The overlap of 50% was kept though. 
+
+In addition, to speed up processing, the image was cut in half (that is, y_start started halfway down the image). This did the job intended, but may cause problems on other video streams, as covered in the Discussion below. 
 
 ## Development
 
@@ -59,7 +62,25 @@ At this point, a lot of time was spent on the following items, in order to devel
 - Applying different thresholds 
 - Averaging out the detections from the heatmap, to smooth the jumping bounding boxes and remove most of the false positives. 
 
-## Conclusion
+## Discussion
 
 The video pipeline accurately detects vehicles in the image. 
 However, there are still various false positives, which need to be improved upon. And when I figure out what other methods besides the deque, are available, I plan to remove them.
+
+### Problems Encountered
+
+The major problems encountered include: 
+- Inability to remove 100% of the false positives - even when averaging the heatmaps, by means of a deque.
+- Identification of vehicles on the other side of the road - modification of the frame width being scanned would 
+solve this problem, but would cause other problems in itself - I currently reside in South Africa, where we drive on the 
+left side of the road, and cutting the left side of the images by modifying xstart and xstop would cut out part of the frame. 
+It would also be a problem on winding roads. 
+I suppose one could have different algorithms for different roads, but I would prefer to think of more innovative solutions. For example, in the future I could train the instance on different views of cars, for example, if the car is 'oncoming', don't identify it, or give a label that at the least shows that its oncoming...
+- Another problem was with optimum color space selection. Certain color spaces behaved better for certain test images, so I am not certain on overall, which color space is best, and whether it has to do with which machine learning technique was implemented for classifying the images. Only further practice will answer this. 
+
+### Failure points
+
+I hard coded in the region to process to eliminate the horizon, as I did in project 3. This definitely needs to be improved upon as it means the model will fail if the area of the camera showing the vehicles changes (for example, up a steep hill, or if a camera is tilted further forward). 
+Another place that I think this specific pipeline would fail is on roads with lots of shadows and changes in light intensity, as my vehicle detection machine learning model did provide an accuracy of 99% on the training data, but this is not a true reflection of its accuracy. More training data in more unique situations encountered while driving would need to be developed. 
+
+I am excited to pursue these issues further and develop a far more robust vehicle detection pipeline. 
