@@ -67,7 +67,7 @@ At this point, a lot of time was spent on the following items, in order to devel
 The video pipeline accurately detects vehicles in the image. 
 However, there are still various false positives, which need to be improved upon. And when I figure out what other methods besides the deque, are available, I plan to remove them.
 
-### Problems Encountered
+### a. Problems Encountered
 
 The major problems encountered include: 
 - Inability to remove 100% of the false positives - even when averaging the heatmaps, by means of a deque.
@@ -78,7 +78,7 @@ It would also be a problem on winding roads.
 I suppose one could have different algorithms for different roads, but I would prefer to think of more innovative solutions. For example, in the future I could train the instance on different views of cars, for example, if the car is 'oncoming', don't identify it, or give a label that at the least shows that its oncoming...
 - Another problem was with optimum color space selection. Certain color spaces behaved better for certain test images, so I am not certain on overall, which color space is best, and whether it has to do with which machine learning technique was implemented for classifying the images. Only further practice will answer this. 
 
-### Failure points
+### b. Failure points
 
 I hard coded in the region to process to eliminate the horizon, as I did in project 3. This definitely needs to be improved upon as it means the model will fail if the area of the camera showing the vehicles changes (for example, up a steep hill, or if a camera is tilted further forward). 
 Another place that I think this specific pipeline would fail is on roads with lots of shadows and changes in light intensity, as my vehicle detection machine learning model did provide an accuracy of 99% on the training data, but this is not a true reflection of its accuracy. More training data in more unique situations encountered while driving would need to be developed. 
